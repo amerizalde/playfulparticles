@@ -15,21 +15,30 @@ DAMPING =           .2
 
 
 class Particle(threading.Thread):
-    def __init__(self, (x, y), color=None):
+    """ Particle object based on threading.
+
+        @args:
+            x := x position
+            y := y position
+
+        @kwargs
+            color   := (R, G, B)
+            life    := how long this particle will run.
+    """
+    def __init__(self, (x, y), **kwargs):
         super(Particle, self).__init__()
         self.old_x = x
         self.old_y = y
         self.x = x
         self.y = y
-        if color is None:
-            self.color = (random.randint(60, 255),
-                random.randint(60, 255),
-                255)
-        else:
-            self.color = color
+        self.color = kwargs.get('color', (
+            random.randint(60, 255),
+            random.randint(60, 255),
+            255))
+        self.life = kwargs.get('life', 200)
 
     def integrate(self):
-        """ Verlet integration. any change in position also updates velocity."""
+        """ Verlet integration. any change in position also updates velocity. """
         global DAMPING
         velocity_x = (self.x - self.old_x) * DAMPING
         velocity_y = (self.y - self.old_y) * DAMPING
@@ -45,6 +54,18 @@ class Particle(threading.Thread):
         distance = math.sqrt((dx * dx) + (dy * dy))
         self.x += dx / distance
         self.y += dy / distance
+
+    def move(self, (x, y)):
+        """ simple move method. """
+        self.x += x;
+        self.y += y;
+
+    def gravity_pull(self, flr):
+        """ simple gravity """
+        if self.y < flr:
+            velocity = self.getVelocity()
+            self.old_y = flr
+            self.y = self.old_y - velocity.y * 0.3
 
     def run(self):
         global GAME_OVER

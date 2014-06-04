@@ -151,7 +151,9 @@ class Game(object):
 
     def _mouse_event(self, event):
         """ Handle all mouse events. """
-        pass
+        global TARGET
+        if event.button == 1:
+            TARGET = event.pos
 
     def draw_grid(self):
         """ Draw the grid and then fill the appropriate cells. """
